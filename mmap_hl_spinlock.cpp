@@ -11,22 +11,17 @@ static PyObject* mmap_hllock(PyObject* self, PyObject* args) {
     Py_buffer o;
     if(! PyArg_ParseTuple(args, "s*", &o))
         return NULL;
-    // std::cout << sizeof(HL::SpinLock) << std::endl;
     if (! initialized) {
         init_lock.lock();
         if(! initialized) {
-            // This assumes that we'll
+            // This assumes that we'll have enough space, but since it's just one byte
+            // I assume that it'll be enough
             spin_lock = new(o.buf) HL::SpinLock();
             initialized = true;
         }
         init_lock.unlock();
     }
     spin_lock->lock();
-    // memcpy(o.buf, "XYZ", strlen("XYZ"));
-//    *((char*) o.buf) = 'a'; 
-    // PyTypeObject* t = o->ob_type;
-    // const char* c = t->tp_name;
-    // std::cout << o << std::endl;
     Py_RETURN_NONE;
 }
 
