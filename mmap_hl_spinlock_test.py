@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname('./build/lib.linux-x86_64-3.8/mmap_hl_spinlock.cpython-38-x86_64-linux-gnu.so'))
 import mmap
 import mmap_hl_spinlock
 import multiprocessing
@@ -6,24 +9,12 @@ import os
 from time import sleep
 
 def main():
-    region = mmap.mmap(-1, mmap.PAGESIZE, flags=mmap.MAP_SHARED)
+    region_fd = open("/tmp/test-lock", "r+")
+    region = mmap.mmap(region_fd.fileno(), mmap.PAGESIZE, flags=mmap.MAP_SHARED)
     # Testing that lock doesn't block
+    mmap_hl_spinlock.lock()
     mmap_hl_spinlock.mmap_hllock(region)
-    mmap_hl_spinlock.mmap_hlunlock(region)
-    res = os.fork()
-    if res == 0:
-        mmap_hl_spinlock.mmap_hllock(region)
-        print(1)
-        sleep(1)
-        print(2)
-        mmap_hl_spinlock.mmap_hlunlock(region)
-        return
-    mmap_hl_spinlock.mmap_hllock(region)
-    print(3)
-    sleep(1)
-    print(4)
-    mmap_hl_spinlock.mmap_hlunlock(region)
-    os.wait()
+    mmap_hl_spinlock.unlock()
 
 
 if __name__ == '__main__':

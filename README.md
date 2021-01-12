@@ -1,3 +1,6 @@
 # HL::Spinlock mmap test
 
-This creates and tests a CPython module that creates a HL::Spinlock in a Python buffer and then utilizes it
+To make this not block when it should, run
+```
+python3 setup.py build && python3 mmap_hl_spinlock_test.py && rm /tmp/test-*
+```
